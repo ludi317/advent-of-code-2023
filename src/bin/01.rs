@@ -1,5 +1,4 @@
 advent_of_code::solution!(1);
-use std::collections::HashMap;
 
 pub fn part_one(input: &str) -> Option<u32> {
     Some(sum_calib_vals(input))
@@ -24,16 +23,8 @@ fn sum_calib_vals(s: &str) -> u32 {
 }
 
 fn sum_calib_vals2(s: &str) -> u32 {
-    let mut words: HashMap<&str, u32> = HashMap::new();
-    words.insert("one", 1);
-    words.insert("two", 2);
-    words.insert("three", 3);
-    words.insert("four", 4);
-    words.insert("five", 5);
-    words.insert("six", 6);
-    words.insert("seven", 7);
-    words.insert("eight", 8);
-    words.insert("nine", 9);
+
+    let words: [&str; 9] = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
 
     s.lines()
         .map(|line| {
@@ -42,22 +33,23 @@ fn sum_calib_vals2(s: &str) -> u32 {
             // Find the first digit and its index
             let digit_find = bs.iter().enumerate().find(|&(_, &b)| b.is_ascii_digit());
 
-            // Find the first word and its index
+            // Find the first word-digit and its index
             let word_find = words
                 .iter()
-                .filter_map(|(word, &val)| line.find(word).map(|i| (i, val)))
-                .min_by_key(|&(i, _)| i);
+                .enumerate()
+                .filter_map(|(i, word)| line.find(word).map(|s_idx| (s_idx, i+1)))
+                .min_by_key(|&(s_idx, _)| s_idx);
 
             // Choose the value with the lower index
-            let first_num = match (digit_find, word_find) {
+            let first_num: usize = match (digit_find, word_find) {
                 (Some((i, &b)), Some((wi, wv))) => {
                     if i < wi {
-                        (b - b'0') as u32
+                        (b - b'0') as usize
                     } else {
                         wv
                     }
                 }
-                (Some((_, &b)), None) => (b - b'0') as u32,
+                (Some((_, &b)), None) => (b - b'0') as usize,
                 (None, Some((_, wv))) => wv,
                 (None, None) => panic!("did not find word or digit in line"),
             };
@@ -67,28 +59,29 @@ fn sum_calib_vals2(s: &str) -> u32 {
                 .iter()
                 .rev()
                 .enumerate()
-                .find(|&(_, &b)| b.is_ascii_digit());
+                .find(|(_, b)| b.is_ascii_digit());
 
             // Find the last word and its index
             let word_find = words
                 .iter()
-                .filter_map(|(word, &val)| line.rfind(word).map(|i| (i, val)))
+                .enumerate()
+                .filter_map(|(i, word)| line.rfind(word).map(|s_idx| (s_idx, i+1)))
                 .max_by_key(|&(i, _)| i);
 
             let last_num = match (digit_find, word_find) {
                 (Some((i, &b)), Some((wi, wv))) => {
                     if bs.len() - i - 1 > wi {
-                        (b - b'0') as u32
+                        (b - b'0') as usize
                     } else {
                         wv
                     }
                 }
-                (Some((_, &b)), None) => (b - b'0') as u32,
+                (Some((_, &b)), None) => (b - b'0') as usize,
                 (None, Some((_, wv))) => wv,
                 (None, None) => panic!("did not find word or digit in line"),
             };
 
-            first_num * 10 + last_num
+            (first_num * 10 + last_num) as u32
         })
         .sum()
 }

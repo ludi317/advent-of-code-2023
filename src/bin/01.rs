@@ -1,7 +1,6 @@
 advent_of_code::solution!(1);
 use std::collections::HashMap;
 
-
 pub fn part_one(input: &str) -> Option<u32> {
     Some(sum_calib_vals(input))
 }
@@ -10,7 +9,6 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(sum_calib_vals2(input))
 }
 
-
 fn sum_calib_vals(s: &str) -> u32 {
     s.lines()
         .map(|line| {
@@ -18,8 +16,7 @@ fn sum_calib_vals(s: &str) -> u32 {
 
             let first_digit = (bs.iter().find(|&b| b.is_ascii_digit()).unwrap() - b'0') as u32;
 
-            let last_digit =
-                (bs.iter().rev().find(|&b| b.is_ascii_digit()).unwrap() - b'0') as u32;
+            let last_digit = (bs.iter().rev().find(|&b| b.is_ascii_digit()).unwrap() - b'0') as u32;
 
             first_digit * 10 + last_digit
         })
@@ -96,8 +93,6 @@ fn sum_calib_vals2(s: &str) -> u32 {
         .sum()
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -110,7 +105,9 @@ mod tests {
 
     #[test]
     fn test_part_two() {
-        let result = part_two(&advent_of_code::template::read_file_part("examples", DAY, 2));
+        let result = part_two(&advent_of_code::template::read_file_part(
+            "examples", DAY, 2,
+        ));
         assert_eq!(result, Some(281));
     }
 }

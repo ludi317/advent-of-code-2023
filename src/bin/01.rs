@@ -11,27 +11,23 @@ pub fn part_two(input: &str) -> Option<u32> {
 fn sum_calib_vals(s: &str) -> u32 {
     s.lines()
         .map(|line| {
-            let bs = line.as_bytes();
-
-            let first_digit = (bs.iter().find(|&b| b.is_ascii_digit()).unwrap() - b'0') as u32;
-
-            let last_digit = (bs.iter().rev().find(|&b| b.is_ascii_digit()).unwrap() - b'0') as u32;
-
-            first_digit * 10 + last_digit
+            let first = line.chars().find_map(|c| c.to_digit(10)).unwrap();
+            let last = line.chars().rev().find_map(|c| c.to_digit(10)).unwrap();
+            first * 10 + last
         })
         .sum()
 }
 
 fn sum_calib_vals2(s: &str) -> u32 {
-
-    let words: [&str; 9] = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    let words: [&str; 9] = [
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    ];
 
     s.lines()
         .map(|line| {
-            let bs = line.as_bytes();
 
             // Find the first digit and its index
-            let digit_find = bs.iter().enumerate().find(|&(_, &b)| b.is_ascii_digit());
+            let digit_find = line.chars().enumerate().find(|(_, b)| b.is_ascii_digit());
 
             // Find the first word-digit and its index
             let word_find = words
@@ -42,21 +38,21 @@ fn sum_calib_vals2(s: &str) -> u32 {
 
             // Choose the value with the lower index
             let first_num: usize = match (digit_find, word_find) {
-                (Some((i, &b)), Some((wi, wv))) => {
+                (Some((i, b)), Some((wi, wv))) => {
                     if i < wi {
-                        (b - b'0') as usize
+                        b.to_digit(10).unwrap() as usize
                     } else {
                         wv
                     }
                 }
-                (Some((_, &b)), None) => (b - b'0') as usize,
+                (Some((_, b)), None) => b.to_digit(10).unwrap() as usize,
                 (None, Some((_, wv))) => wv,
                 (None, None) => panic!("did not find word or digit in line"),
             };
 
             // Find the last digit and its reverse-index
-            let digit_find = bs
-                .iter()
+            let digit_find = line
+                .chars()
                 .rev()
                 .enumerate()
                 .find(|(_, b)| b.is_ascii_digit());
@@ -69,14 +65,14 @@ fn sum_calib_vals2(s: &str) -> u32 {
                 .max_by_key(|&(i, _)| i);
 
             let last_num = match (digit_find, word_find) {
-                (Some((i, &b)), Some((wi, wv))) => {
-                    if bs.len() - i - 1 > wi {
-                        (b - b'0') as usize
+                (Some((i, b)), Some((wi, wv))) => {
+                    if line.len() - i - 1 > wi {
+                        b.to_digit(10).unwrap() as usize
                     } else {
                         wv
                     }
                 }
-                (Some((_, &b)), None) => (b - b'0') as usize,
+                (Some((_, b)), None) => b.to_digit(10).unwrap() as usize,
                 (None, Some((_, wv))) => wv,
                 (None, None) => panic!("did not find word or digit in line"),
             };

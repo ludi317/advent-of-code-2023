@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use hashbrown::HashSet;
 advent_of_code::solution!(4);
 
 pub fn part_one(input: &str) -> Option<usize> {
@@ -11,7 +11,7 @@ pub fn part_one(input: &str) -> Option<usize> {
         .map(|line| {
             let win: HashSet<u32> = get_nums(&line[win_start..win_end]).into_iter().collect();
             let have = get_nums(&line[have_start..]);
-            let num_matches = have.iter().filter(|n| win.contains(n)).count();
+            let num_matches = have.iter().filter(|&n| win.contains(n)).count();
             if num_matches > 1 {
                 return 1 << (num_matches - 1);
             }
@@ -52,7 +52,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         i += 1;
         let win: HashSet<u32> = get_nums(&line[win_start..win_end]).into_iter().collect();
         let have = get_nums(&line[have_start..]);
-        let num_matches = have.iter().filter(|n| win.contains(n)).count();
+        let num_matches = have.iter().filter(|&n| win.contains(n)).count();
         for j in 1..=num_matches {
             card_count[i+j] += card_count[i];
         }

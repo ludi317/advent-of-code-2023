@@ -21,24 +21,6 @@ pub fn part_one(input: &str) -> Option<usize> {
     Some(sum)
 }
 
-// parses a sequence of *non-zero* digits
-fn get_nums(s: &str) -> Vec<u32> {
-    let mut nums = vec![];
-    let mut num = 0;
-    for c in s.chars() {
-        if c.is_ascii_digit() {
-            num = 10 * num + c.to_digit(10).unwrap();
-        } else if num != 0 {
-            nums.push(num);
-            num = 0;
-        }
-    }
-    if num != 0 {
-        nums.push(num);
-    }
-    nums
-}
-
 pub fn part_two(input: &str) -> Option<u32> {
     let lines: Vec<_> = input.split('\n').collect();
     let first_line = lines[0];
@@ -62,9 +44,38 @@ pub fn part_two(input: &str) -> Option<u32> {
     Some(card_count.iter().sum())
 }
 
+// parses a sequence of *non-negative* numbers
+fn get_nums(s: &str) -> Vec<u32> {
+    let mut nums = vec![];
+    let mut num = 0;
+    let mut num_found = false;
+    for c in s.chars() {
+        if c.is_ascii_digit() {
+            num = 10 * num + c.to_digit(10).unwrap();
+            num_found = true;
+        } else if num_found {
+            nums.push(num);
+            num = 0;
+            num_found = false;
+        }
+    }
+    if num != 0 {
+        nums.push(num);
+    }
+    nums
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_get_nums() {
+        let s = " 4 3 5 645 23 2 0 77    3 ";
+        let v = get_nums(s);
+        assert_eq!(v, vec![4, 3, 5, 645, 23, 2, 0, 77,3]);
+
+    }
 
     #[test]
     fn test_part_one() {

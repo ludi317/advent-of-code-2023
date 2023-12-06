@@ -43,6 +43,40 @@ fn generate_maps(input: &str) -> Vec<Vec<Entry>> {
     maps
 }
 
+fn resolve_range(mut ranges: Vec<[isize; 2]>, maps: &Vec<Vec<Entry>>) -> Vec<[isize; 2]> {
+    for map in maps {
+        let mut i = 0;
+        while i < ranges.len() {
+            for entry in map {
+                let overlap_start = entry.src_start.max(ranges[i][0]);
+                let overlap_end = (entry.src_start + entry.range).min(ranges[i][0] + ranges[i][1]);
+                // no overlap
+                if !(overlap_start < overlap_end) {
+                    continue;
+                }
+                // snip the left end of the range
+                if ranges[i][0] < entry.src_start {
+                    let new_range_len = entry.src_start - ranges[i][0];
+                    ranges.push([ranges[i][0], new_range_len]);
+                    ranges[i][0] = entry.src_start;
+                    ranges[i][1] -= new_range_len
+                }
+                // snip the right end of the range
+                if ranges[i][0] + ranges[i][1] > entry.src_start + entry.range {
+                    let overhang = ranges[i][0] + ranges[i][1] - (entry.src_start + entry.range);
+                    ranges.push([entry.src_start + entry.range, overhang]);
+                    ranges[i][1] -= overhang;
+                }
+                // map this one
+                ranges[i][0] += entry.delta;
+                break;
+            }
+            i += 1;
+        }
+    }
+    ranges
+}
+
 fn resolve(mut seed: isize, maps: &Vec<Vec<Entry>>) -> isize {
     for map in maps {
         for entry in map {
@@ -58,18 +92,20 @@ fn resolve(mut seed: isize, maps: &Vec<Vec<Entry>>) -> isize {
 pub fn part_two(input: &str) -> Option<isize> {
     let mut lines = input.lines();
 
-    let seed_range = get_nums(lines.next().unwrap());
-    let mut seeds = vec![];
+    let seeds = get_nums(lines.next().unwrap());
+    let mut seed_ranges: Vec<[isize; 2]> = vec![];
     let mut i = 0;
-    while i + 1 < seed_range.len() {
-        for j in 0..seed_range[i + 1] {
-            seeds.push(seed_range[i] + j);
-        }
+    while i + 1 < seeds.len() {
+        seed_ranges.push([seeds[i], seeds[i + 1]]);
         i += 2;
     }
     let maps = generate_maps(input);
 
-    seeds.into_iter().map(|seed| resolve(seed, &maps)).min()
+     seed_ranges
+        .into_iter()
+        .flat_map(|range| resolve_range(vec![range], &maps))
+        .min_by_key(|[start, _]| *start)
+        .map(|[start, _]| start)
 }
 
 fn get_nums(s: &str) -> Vec<isize> {

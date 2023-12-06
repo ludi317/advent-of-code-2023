@@ -59,7 +59,7 @@ fn get_nums(s: &str) -> Vec<u32> {
             num_found = false;
         }
     }
-    if num != 0 {
+    if num_found {
         nums.push(num);
     }
     nums
@@ -71,9 +71,9 @@ mod tests {
 
     #[test]
     fn test_get_nums() {
-        let s = " 4 3 5 645 23 2 0 77    3 ";
+        let s = " 4 3 5 645 23 2 0";
         let v = get_nums(s);
-        assert_eq!(v, vec![4, 3, 5, 645, 23, 2, 0, 77,3]);
+        assert_eq!(v, vec![4, 3, 5, 645, 23, 2, 0]);
 
     }
 

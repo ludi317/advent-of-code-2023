@@ -65,7 +65,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                         if grid[i][j].is_ascii_digit() {
                             num_count += 1;
                             // move j rightwards to avoid double-counting long numbers
-                            let mut num = 0;
+                            let num;
                             (num, j) = expand(&grid, i, j);
                             prod *= num;
                         } else {

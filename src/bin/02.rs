@@ -40,7 +40,7 @@ struct Cube {
 }
 
 fn cube(mut input: &str) -> IResult<&str, Cube> {
-    let mut a = "";
+    let mut a;
     let mut red = 0;
     let mut green = 0;
     let mut blue = 0;

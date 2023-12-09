@@ -37,7 +37,6 @@ pub fn part_one(input: &str) -> Option<u32> {
     )
 }
 
-
 fn card_to_num(c: char) -> u32 {
     match c {
         '2'..='9' => c.to_digit(10).unwrap(),
@@ -102,7 +101,6 @@ pub fn part_two(input: &str) -> Option<u32> {
             .sum(),
     )
 }
-
 
 fn card_to_num_2(c: char) -> u32 {
     match c {

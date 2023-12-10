@@ -5,26 +5,14 @@ pub fn part_one(input: &str) -> Option<isize> {
     let sum = input
         .lines()
         .map(|line| {
-            let mut v: Vec<Vec<isize>> = vec![];
-            v.push(get_nums(line));
-            // while last line is not all zeroes
-            while !v[v.len() - 1].iter().all(|&e| e == 0) {
-                let mut v_next = vec![];
-                let last_vec = &v[v.len() - 1];
-                for i in 0..(last_vec.len() - 1) {
-                    // take the diff
-                    v_next.push(last_vec[i + 1] - last_vec[i])
-                }
-                v.push(v_next);
+            let mut nums = get_nums(line);
+            let mut ends = nums[nums.len() - 1];
+            // while nums is not all zeroes
+            while !nums.iter().all(|&e| e == 0) {
+                nums = nums.windows(2).map(|pair| pair[1] - pair[0]).collect();
+                ends += nums[nums.len() - 1];
             }
-            let last_idx = v.len() - 1;
-            v[last_idx].push(0);
-            for i in (0..=v.len() - 2).rev() {
-                let left = v[i][v[i].len() - 1];
-                let down = v[i + 1][v[i + 1].len() - 1];
-                v[i].push(left + down);
-            }
-            v[0][v[0].len() -1]
+            ends
         })
         .sum();
     Some(sum)
@@ -34,28 +22,15 @@ pub fn part_two(input: &str) -> Option<isize> {
     let sum = input
         .lines()
         .map(|line| {
-            let mut v: Vec<Vec<isize>> = vec![];
             let mut nums = get_nums(line);
             nums.reverse();
-            v.push(nums);
-            // while last line is not all zeroes
-            while !v[v.len() - 1].iter().all(|&e| e == 0) {
-                let mut v_next = vec![];
-                let last_vec = &v[v.len() - 1];
-                for i in 0..(last_vec.len() - 1) {
-                    // take the diff
-                    v_next.push(last_vec[i + 1] - last_vec[i])
-                }
-                v.push(v_next);
+            let mut ends = nums[nums.len() - 1];
+            // while nums is not all zeroes
+            while !nums.iter().all(|&e| e == 0) {
+                nums = nums.windows(2).map(|pair| pair[1] - pair[0]).collect();
+                ends += nums[nums.len() - 1];
             }
-            let last_idx = v.len() - 1;
-            v[last_idx].push(0);
-            for i in (0..=v.len() - 2).rev() {
-                let left = v[i][v[i].len() - 1];
-                let down = v[i + 1][v[i + 1].len() - 1];
-                v[i].push(left + down);
-            }
-            v[0][v[0].len() -1]
+            ends
         })
         .sum();
     Some(sum)

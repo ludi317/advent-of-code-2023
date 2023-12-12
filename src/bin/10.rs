@@ -3,74 +3,7 @@ advent_of_code::solution!(10);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut start: [isize; 2] = [0, 0];
-    let grid: Vec<Vec<char>> = input.lines().enumerate().map(|(i, line)| {
-            // find the start
-            if let Some(j) = line.find('S') {
-                start = [i as isize, j as isize];
-            }
-            line.chars().collect()
-        })
-        .collect();
-    let cols = grid[0].len() as isize;
-    let rows = grid.len() as isize;
-
-    let mut first_pos = [0, 0];
-    let dirs: [[isize; 2]; 4] = [[-1, 0], [0, 1], [1, 0], [0, -1]];
-
-    // find first tile from S
-    for (i, dir) in dirs.iter().enumerate() {
-        let nr = start[0] + dir[0];
-        let nc = start[1] + dir[1];
-        if nr == -1 || nr == rows || nc == -1 || nc == cols {
-            continue;
-        }
-        if is_connecting_tile(grid[nr as usize][nc as usize], i) {
-            first_pos = [nr, nc];
-            break;
-        }
-    }
-    let mut prev = start;
-    let mut pos = first_pos;
-    let mut path_len = 1;
-    while pos != start {
-        let delta = match grid[pos[0] as usize][pos[1] as usize] {
-            '|' => [[1, 0], [-1, 0]],
-            '-' => [[0, 1], [0, -1]],
-            'L' => [[-1, 0], [0, 1]],
-            'J' => [[-1, 0], [0, -1]],
-            '7' => [[1, 0], [0, -1]],
-            'F' => [[1, 0], [0, 1]],
-            _ => unreachable!(),
-        };
-
-        for d in delta {
-            let new_pos = [d[0] + pos[0], d[1] + pos[1]];
-            // don't go back to the previous tile
-            if new_pos != prev {
-                prev = pos;
-                pos = new_pos;
-                break;
-            }
-        }
-        path_len += 1;
-    }
-
-    Some(path_len / 2)
-}
-
-fn is_connecting_tile(tile: char, dir_idx: usize) -> bool {
-    match dir_idx {
-        0 => matches!(tile, '|' | '7' | 'F'), // north
-        1 => matches!(tile, '-' | 'J' | '7'), // east
-        2 => matches!(tile, '|' | 'L' | 'J'), // south
-        3 => matches!(tile, '-' | 'L' | 'F'), // west
-        _ => false,
-    }
-}
-
-pub fn part_two(input: &str) -> Option<u32> {
-    let mut start: [isize; 2] = [0, 0];
-    let mut grid: Vec<Vec<char>> = input
+    let grid: Vec<Vec<char>> = input
         .lines()
         .enumerate()
         .map(|(i, line)| {
@@ -84,83 +17,141 @@ pub fn part_two(input: &str) -> Option<u32> {
     let cols = grid[0].len() as isize;
     let rows = grid.len() as isize;
 
-    let mut first_pos = [0, 0];
+    let mut cur_dir = 0;
     let dirs: [[isize; 2]; 4] = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+    let is_connecting_tile = ["|7F", "-7J", "|JL", "-FL"];
 
-    // find first tile from S
+    // find first dir from S
     for (i, dir) in dirs.iter().enumerate() {
         let nr = start[0] + dir[0];
         let nc = start[1] + dir[1];
         if nr == -1 || nr == rows || nc == -1 || nc == cols {
             continue;
         }
-        if is_connecting_tile(grid[nr as usize][nc as usize], i) {
-            first_pos = [nr, nc];
+        if is_connecting_tile[i].contains(grid[nr as usize][nc as usize]) {
+            cur_dir = i;
+        }
+    }
+    // move once
+    let mut pos = [dirs[cur_dir][0] + start[0], dirs[cur_dir][1] + start[1]];
+    let mut path_len = 1;
+    while pos != start {
+        let c = grid[pos[0] as usize][pos[1] as usize];
+        cur_dir = match (cur_dir, c) {
+            (0, '|') => 0,
+            (0, '7') => 3,
+            (0, 'F') => 1,
+            (1, '-') => 1,
+            (1, '7') => 2,
+            (1, 'J') => 0,
+            (2, '|') => 2,
+            (2, 'J') => 3,
+            (2, 'L') => 1,
+            (3, '-') => 3,
+            (3, 'L') => 0,
+            (3, 'F') => 2,
+            _ => unreachable!(),
+        };
+
+        pos[0] += dirs[cur_dir][0];
+        pos[1] += dirs[cur_dir][1];
+
+        path_len += 1;
+    }
+
+    Some(path_len / 2)
+}
+
+pub fn part_two(input: &str) -> Option<u32> {
+    let mut start: [isize; 2] = [0, 0];
+    let grid: Vec<Vec<char>> = input
+        .lines()
+        .enumerate()
+        .map(|(i, line)| {
+            // find the start
+            if let Some(j) = line.find('S') {
+                start = [i as isize, j as isize];
+            }
+            line.chars().collect()
+        })
+        .collect();
+    let cols = grid[0].len() as isize;
+    let rows = grid.len() as isize;
+
+    let mut cur_dir = 0;
+    let dirs: [[isize; 2]; 4] = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+    let is_connecting_tile = ["|7F", "-7J", "|JL", "-FL"];
+    let mut is_S_IJL = false;
+
+    // brute force find first dir from S
+    for (i, dir) in dirs.iter().enumerate() {
+        let nr = start[0] + dir[0];
+        let nc = start[1] + dir[1];
+        if nr == -1 || nr == rows || nc == -1 || nc == cols {
+            continue;
+        }
+        if is_connecting_tile[i].contains(grid[nr as usize][nc as usize]) {
+            cur_dir = i;
+            is_S_IJL = i == 0; // if up is a valid direction, S must be |, J, or L
             break;
         }
     }
     let mut path: HashSet<[isize; 2]> = HashSet::new();
-    path.insert(first_pos);
-    let mut prev = start;
-    let mut pos = first_pos;
+    let mut pos = [dirs[cur_dir][0] + start[0], dirs[cur_dir][1] + start[1]];
+    path.insert(pos);
     while pos != start {
-        let delta = match grid[pos[0] as usize][pos[1] as usize] {
-            '|' => [[1, 0], [-1, 0]],
-            '-' => [[0, 1], [0, -1]],
-            'L' => [[-1, 0], [0, 1]],
-            'J' => [[-1, 0], [0, -1]],
-            '7' => [[1, 0], [0, -1]],
-            'F' => [[1, 0], [0, 1]],
-            _ => unreachable!(),
+        let c = grid[pos[0] as usize][pos[1] as usize];
+        cur_dir = match (cur_dir, c) {
+            (0, '|') => 0,
+            (0, '7') => 3,
+            (0, 'F') => 1,
+            (1, '-') => 1,
+            (1, '7') => 2,
+            (1, 'J') => 0,
+            (2, '|') => 2,
+            (2, 'J') => 3,
+            (2, 'L') => 1,
+            (3, '-') => 3,
+            (3, 'L') => 0,
+            (3, 'F') => 2,
+            _ => cur_dir,
         };
 
-        for d in delta {
-            let new_pos = [d[0] + pos[0], d[1] + pos[1]];
-            // don't go back to the previous tile
-            if new_pos != prev {
-                prev = pos;
-                pos = new_pos;
-                break;
-            }
-        }
+        pos[0] += dirs[cur_dir][0];
+        pos[1] += dirs[cur_dir][1];
         path.insert(pos);
     }
 
-    // replace S with a pipe
-
-    // find its neighbors in the path
-    let mut neighs = [0usize; 2];
-    let mut j = 0;
-    for (i, dir) in dirs.iter().enumerate() {
-        if path.contains(&[dir[0] + start[0], dir[1] + start[1]])
-            && is_connecting_tile(grid[(dir[0] + start[0]) as usize][(dir[1] + start[1]) as usize], i)
-        {
-            neighs[j] = i;
-            j += 1;
-        }
-    }
-
-    // replace S
-    grid[start[0] as usize][start[1] as usize] = match neighs {
-        [0, 1] => 'L',
-        [0, 2] => '|',
-        [0, 3] => 'J',
-        [1, 2] => 'F',
-        [1, 3] => '-',
-        [2, 3] => '7',
-        _ => unreachable!(),
-    };
-
-    // count
+    // count the number of tiles on the inside of the path
+    // Clearly, crossing a vertical boundary changes whether you are inside or out.
+    // There are four corners: 'L', 'J', 'F', and '7'.
+    // Scanning rows from left to right gives an 'L' or 'F' first. The path loops within the grid.
+    // 'L' can be followed by '-'* and either '7' or 'J'.
+    // Same for 'F'.
+    // An 'L-*J' should flip the inside flag an even number of times. That is, if you were on the outside (or inside) before the L, you remain on the outside (or inside) after the J.
+    // Same for 'F-*7'.
+    // 'L-*7' should flip the inside flag and odd number of times. It's like crossing vertical boundary. Outside -> Inside and Inside -> Outside.
+    // Same for 'F-*J'.
+    // L + J = 0 or 2
+    // F + 7 = 0 or 2
+    // L + 7 = 1
+    // F + J = 1
+    // Solve and get either:
+    // L = 1, J = 1, F = 0, 7 = 0
+    // L = 0, J = 0, F = 1, 7 = 1
     let mut inside_count = 0;
-    let mut inside = false;
     for i in 0..rows {
+        let mut inside = false;
         for j in 0..cols {
-            if path.contains(&[i, j]) && matches!(grid[i as usize][j as usize], '|' | 'J' | 'L') {
-                inside = !inside;
-            }
-            if inside && !path.contains(&[i, j]) {
-                inside_count += 1;
+            if path.contains(&[i, j]) {
+                let c = grid[i as usize][j as usize];
+                if matches!(c, '|' | 'J' | 'L') || (c == 'S' && is_S_IJL) {
+                    inside = !inside;
+                }
+            } else {
+                if inside {
+                    inside_count += 1;
+                }
             }
         }
     }

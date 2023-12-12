@@ -26,7 +26,7 @@ pub fn part_one(input: &str) -> Option<usize> {
     // expand rows
     let mut i = galaxies.len() - 1;
     for b in blank_rows.iter().rev() {
-        while galaxies[i][0] > *b {
+        while i >= 0 && galaxies[i][0] > *b {
             i -= 1;
         }
         i += 1;
@@ -46,7 +46,7 @@ pub fn part_one(input: &str) -> Option<usize> {
 
     let mut i = galaxies.len() - 1;
     for b in blank_cols.iter().rev() {
-        while galaxies[i][1] > *b {
+        while i >= 0 && galaxies[i][1] > *b {
             i -= 1;
         }
         i += 1;
@@ -98,7 +98,7 @@ pub fn part_two(input: &str) -> Option<usize> {
     // expand rows
     let mut i = galaxies.len() - 1;
     for b in blank_rows.iter().rev() {
-        while galaxies[i][0] > *b {
+        while i >= 0 && galaxies[i][0] > *b {
             i -= 1;
         }
         i += 1;
@@ -118,7 +118,7 @@ pub fn part_two(input: &str) -> Option<usize> {
 
     let mut i = galaxies.len() - 1;
     for b in blank_cols.iter().rev() {
-        while galaxies[i][1] > *b {
+        while i >= 0 && galaxies[i][1] > *b {
             i -= 1;
         }
         i += 1;

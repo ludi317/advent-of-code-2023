@@ -1,63 +1,57 @@
 advent_of_code::solution!(11);
 
 pub fn part_one(input: &str) -> Option<usize> {
+    calc_dist(input, 2)
+}
+
+pub fn part_two(input: &str) -> Option<usize> {
+    calc_dist(input, 100)
+}
+
+fn calc_dist(input: &str, exp_factor: usize) -> Option<usize> {
     let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
-    let blank_rows: Vec<usize> = grid
-        .iter()
-        .enumerate()
-        .filter(|&(_, row)| row.iter().all(|&c| c == '.'))
-        .map(|(i, _)| i)
-        .collect();
-
-    let blank_cols: Vec<usize> = (0..grid[0].len())
-        .filter(|&c| grid.iter().all(|row| row[c] == '.'))
-        .collect();
-
-    let mut galaxies: Vec<[usize; 2]> = vec![];
-    for (i, row) in grid.iter().enumerate() {
-        for (j, &c) in row.iter().enumerate() {
-            if c == '#' {
+    // row-based expansion
+    let mut galaxies = vec![];
+    let mut num_prev_blanks = 0;
+    for i in 0..grid.len() {
+        let mut num_galaxies_in_row = 0;
+        for j in 0..grid[i].len() {
+            if grid[i][j] == '#' {
                 galaxies.push([i, j]);
+                num_galaxies_in_row += 1;
+            }
+        }
+        if num_galaxies_in_row == 0 {
+            num_prev_blanks += 1;
+        } else {
+            for i in 0..num_galaxies_in_row {
+                let g_len = galaxies.len();
+                galaxies[g_len - 1 - i][0] += num_prev_blanks * (exp_factor - 1)
             }
         }
     }
 
-    let mut cum_sum = vec![0; galaxies.len() + 1];
-    // expand rows
-    let mut i = galaxies.len() - 1;
-    for b in blank_rows.iter().rev() {
-        while i >= 0 && galaxies[i][0] > *b {
-            i -= 1;
-        }
-        i += 1;
-        cum_sum[i] += 1;
-    }
-
-    let mut sum: usize = 0;
-    for i in 0..galaxies.len() {
-        sum += cum_sum[i];
-        galaxies[i][0] += sum;
-    }
-
-    // expand cols
+    // sort galaxies by col
     galaxies.sort_by(|a, b| a[1].cmp(&b[1]));
 
-    cum_sum.fill(0);
-
-    let mut i = galaxies.len() - 1;
-    for b in blank_cols.iter().rev() {
-        while i >= 0 && galaxies[i][1] > *b {
-            i -= 1;
+    // col-based expansion
+    num_prev_blanks = 0;
+    let mut galaxy_idx = 0;
+    for j in 0..grid[0].len() {
+        let mut num_galaxies_in_col = 0;
+        for i in 0..grid.len() {
+            if grid[i][j] == '#' {
+                num_galaxies_in_col += 1;
+            }
         }
-        i += 1;
-
-        cum_sum[i] += 1;
-    }
-
-    let mut sum = 0;
-    for i in 0..galaxies.len() {
-        sum += cum_sum[i];
-        galaxies[i][1] += sum;
+        if num_galaxies_in_col == 0 {
+            num_prev_blanks += 1;
+        } else {
+            for i in 0..num_galaxies_in_col {
+                galaxies[galaxy_idx + i][1] += num_prev_blanks * (exp_factor - 1);
+            }
+            galaxy_idx += num_galaxies_in_col;
+        }
     }
 
     let mut sum = 0;
@@ -69,78 +63,6 @@ pub fn part_one(input: &str) -> Option<usize> {
         }
     }
     Some(sum)
-}
-
-pub fn part_two(input: &str) -> Option<usize> {
-    const EXP: u32 = 1_000_000;
-    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
-    let blank_rows: Vec<usize> = grid
-        .iter()
-        .enumerate()
-        .filter(|&(_, row)| row.iter().all(|&c| c == '.'))
-        .map(|(i, _)| i)
-        .collect();
-
-    let blank_cols: Vec<usize> = (0..grid[0].len())
-        .filter(|&c| grid.iter().all(|row| row[c] == '.'))
-        .collect();
-
-    let mut galaxies: Vec<[usize; 2]> = vec![];
-    for (i, row) in grid.iter().enumerate() {
-        for (j, &c) in row.iter().enumerate() {
-            if c == '#' {
-                galaxies.push([i, j]);
-            }
-        }
-    }
-
-    let mut cum_sum = vec![0; galaxies.len() + 1];
-    // expand rows
-    let mut i = galaxies.len() - 1;
-    for b in blank_rows.iter().rev() {
-        while i >= 0 && galaxies[i][0] > *b {
-            i -= 1;
-        }
-        i += 1;
-        cum_sum[i] += (EXP - 1) as usize;
-    }
-
-    let mut sum: usize = 0;
-    for i in 0..galaxies.len() {
-        sum += cum_sum[i];
-        galaxies[i][0] += sum;
-    }
-
-    // expand cols
-    galaxies.sort_by(|a, b| a[1].cmp(&b[1]));
-
-    cum_sum.fill(0);
-
-    let mut i = galaxies.len() - 1;
-    for b in blank_cols.iter().rev() {
-        while i >= 0 && galaxies[i][1] > *b {
-            i -= 1;
-        }
-        i += 1;
-
-        cum_sum[i] += (EXP - 1) as usize;
-    }
-
-    let mut sum = 0;
-    for i in 0..galaxies.len() {
-        sum += cum_sum[i];
-        galaxies[i][1] += sum;
-    }
-
-    let mut sum_ans = 0;
-    for i in 0..galaxies.len() {
-        for j in i + 1..galaxies.len() {
-            let dist =
-                galaxies[j][0].abs_diff(galaxies[i][0]) + galaxies[j][1].abs_diff(galaxies[i][1]);
-            sum_ans += dist
-        }
-    }
-    Some(sum_ans)
 }
 
 #[cfg(test)]
@@ -156,7 +78,7 @@ mod tests {
     #[test]
     fn test_part_two() {
         // Set EXP to 100
-        // let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        // assert_eq!(result, Some(8410));
+        let result = part_two(&advent_of_code::template::read_file("examples", DAY));
+        assert_eq!(result, Some(8410));
     }
 }

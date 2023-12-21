@@ -10,6 +10,7 @@ dependencies = [
  "matches",
  "nom",
  "num",
+ "pheap",
  "pico-args",
 ]
 
@@ -162,6 +163,15 @@ name = "once_cell"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
+
+[[package]]
+name = "pheap"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64fdff273cb009ea15c5cbc3c9b693ad5c55c61118c533628bc60a35beed2b55"
+dependencies = [
+ "num-traits",
+]
 
 [[package]]
 name = "pico-args"

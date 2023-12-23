@@ -11,26 +11,27 @@ Solutions for [Advent of Code](https://adventofcode.com/) in [Rust](https://www.
 
 | Day | Part 1 | Part 2 |
 | :---: | :---: | :---:  |
-| [Day 1](./src/bin/01.rs) | `34.1µs` | `627.3µs` |
-| [Day 2](./src/bin/02.rs) | `27.7µs` | `26.0µs` |
-| [Day 3](./src/bin/03.rs) | `67.5µs` | `48.4µs` |
-| [Day 4](./src/bin/04.rs) | `100.8µs` | `97.6µs` |
-| [Day 5](./src/bin/05.rs) | `20.5µs` | `25.2µs` |
-| [Day 6](./src/bin/06.rs) | `175.0ns` | `127.0ns` |
+| [Day 1](./src/bin/01.rs) | `33.0µs` | `627.4µs` |
+| [Day 2](./src/bin/02.rs) | `27.1µs` | `25.6µs` |
+| [Day 3](./src/bin/03.rs) | `66.6µs` | `48.6µs` |
+| [Day 4](./src/bin/04.rs) | `101.3µs` | `99.0µs` |
+| [Day 5](./src/bin/05.rs) | `20.3µs` | `25.2µs` |
+| [Day 6](./src/bin/06.rs) | `213.0ns` | `143.0ns` |
 | [Day 7](./src/bin/07.rs) | `1.1ms` | `1.1ms` |
-| [Day 8](./src/bin/08.rs) | `354.9µs` | `1.2ms` |
-| [Day 9](./src/bin/09.rs) | `88.7µs` | `86.2µs` |
-| [Day 10](./src/bin/10.rs) | `88.8µs` | `471.1µs` |
-| [Day 11](./src/bin/11.rs) | `110.1µs` | `106.1µs` |
-| [Day 12](./src/bin/12.rs) | `2.5ms` | `122.3ms` |
-| [Day 13](./src/bin/13.rs) | `125.2µs` | `135.2µs` |
-| [Day 14](./src/bin/14.rs) | `42.6µs` | `12.5ms` |
-| [Day 15](./src/bin/15.rs) | `46.6µs` | `155.7µs` |
-| [Day 16](./src/bin/16.rs) | `179.6µs` | `41.5ms` |
-| [Day 17](./src/bin/17.rs) | `52.9ms` | `198.5ms` |
-| [Day 18](./src/bin/18.rs) | `32.9µs` | `32.7µs` |
+| [Day 8](./src/bin/08.rs) | `353.4µs` | `1.2ms` |
+| [Day 9](./src/bin/09.rs) | `89.0µs` | `86.0µs` |
+| [Day 10](./src/bin/10.rs) | `88.7µs` | `471.8µs` |
+| [Day 11](./src/bin/11.rs) | `110.0µs` | `107.0µs` |
+| [Day 12](./src/bin/12.rs) | `2.5ms` | `122.4ms` |
+| [Day 13](./src/bin/13.rs) | `125.7µs` | `135.2µs` |
+| [Day 14](./src/bin/14.rs) | `33.5µs` | `12.6ms` |
+| [Day 15](./src/bin/15.rs) | `46.6µs` | `156.8µs` |
+| [Day 16](./src/bin/16.rs) | `179.7µs` | `41.0ms` |
+| [Day 17](./src/bin/17.rs) | `50.4ms` | `194.3ms` |
+| [Day 18](./src/bin/18.rs) | `33.0µs` | `32.8µs` |
+| [Day 19](./src/bin/19.rs) | `109.0µs` | `155.1µs` |
 
-**Total: 436.73ms**
+**Total: 429.99ms**
 <!--- benchmarking table --->
 
 ---

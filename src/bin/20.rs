@@ -12,7 +12,7 @@ pub struct Input {
 #[derive(Debug, Clone, PartialEq)]
 enum ModuleType {
     FlipFlop,
-    Conjuction,
+    Conjunction, // unnecessary
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -22,7 +22,7 @@ enum Memory {
     Map(HashMap<String, Pulse>),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 enum Pulse {
     Low,
     High
@@ -32,7 +32,7 @@ impl From<char> for ModuleType {
     fn from(c: char) -> Self {
         match c {
             '%' => Self::FlipFlop,
-            '&' => Self::Conjuction,
+            '&' => Self::Conjunction,
             _ => unreachable!(),
         }
     }
@@ -50,7 +50,7 @@ impl Module {
     fn new(name: String, module_type: ModuleType, outputs: Vec<String>) -> Self {
         let memory = match module_type {
             ModuleType::FlipFlop => Memory::Off,
-            ModuleType::Conjuction => Memory::Map(HashMap::new()),
+            ModuleType::Conjunction => Memory::Map(HashMap::new()),
         };
 
         Self {
@@ -87,7 +87,7 @@ pub fn input_generator(input: &str) -> Input {
     for (name, module) in modules.clone().iter() {
         for output in module.outputs.iter() {
             if let Some(m) = modules.get_mut(output) {
-                if let ModuleType::Conjuction = m.module_type {
+                if let ModuleType::Conjunction = m.module_type {
                     if let Memory::Map(ref mut map) = m.memory {
                         map.insert(name.clone(), Pulse::Low);
                     }
@@ -146,15 +146,15 @@ pub fn part_one(input: &str) -> Option<u32> {
 
                         for output in module.outputs.iter() {
                             queue.push_back(
-                                (module.name.clone(), output.clone(), next_pulse.clone())
+                                (module.name.clone(), output.clone(), next_pulse)
                             );
                         }
                     }
                 }
 
-                ModuleType::Conjuction => {
+                ModuleType::Conjunction => {
                     if let Memory::Map(ref mut map) = module.memory {
-                        map.insert(from, pulse.clone());
+                        map.insert(from, pulse);
 
                         let next_pulse = if map.values().all(|x| *x == Pulse::High) {
                             Pulse::Low
@@ -164,7 +164,7 @@ pub fn part_one(input: &str) -> Option<u32> {
 
                         for output in module.outputs.iter() {
                             queue.push_back(
-                                (module.name.clone(), output.clone(), next_pulse.clone())
+                                (module.name.clone(), output.clone(), next_pulse)
                             );
                         }
                     }
@@ -182,14 +182,14 @@ pub fn part_two(input: &str) -> Option<u64> {
     let mut button_presses = 0;
 
     // Find which module feeds into "rx". This should only be one.
-    // This is "hp" in my input.
+    // This is "zh" in my input.
     let feed = input
         .modules
         .values()
         .find(|module| module.outputs.contains(&"rx".to_string()))
         .unwrap();
 
-    // Find the modules that feed into the module, "hp", that feeds into "rx".
+    // Find the modules that feed into the module, "zh", that feeds into "rx".
     // We'll use these to find the cycle length and then we can calculate the
     // LCM of the cycle lengths.
     let mut cycle_lengths: HashMap<String, u64> = HashMap::new();
@@ -219,7 +219,7 @@ pub fn part_two(input: &str) -> Option<u64> {
 
                 let module = modules.get_mut(&to).unwrap();
 
-                // We only care about the module that feeds into "hp"
+                // We only care about the module that feeds into "zh"
                 // and we only care about high pulses
                 if module.name == feed.name && pulse == Pulse::High {
                     seen.entry(from.clone()).and_modify(|x| *x += 1);
@@ -229,7 +229,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                         cycle_lengths.insert(from.clone(), button_presses);
                     }
 
-                    // We've seen all the modules that feed into "hp"
+                    // We've seen all the modules that feed into "zh"
                     // Calculate the LCM of the cycle lengths and break
                     if seen.values().all(|x| *x == 1) {
                         break 'outer cycle_lengths
@@ -256,15 +256,15 @@ pub fn part_two(input: &str) -> Option<u64> {
                                 queue.push_back((
                                     module.name.clone(),
                                     output.clone(),
-                                    next_pulse.clone(),
+                                    next_pulse,
                                 ));
                             }
                         }
                     }
 
-                    ModuleType::Conjuction => {
+                    ModuleType::Conjunction => {
                         if let Memory::Map(ref mut map) = module.memory {
-                            map.insert(from, pulse.clone());
+                            map.insert(from, pulse);
 
                             let next_pulse = if map.values().all(|x| *x == Pulse::High) {
                                 Pulse::Low
@@ -276,7 +276,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                                 queue.push_back((
                                     module.name.clone(),
                                     output.clone(),
-                                    next_pulse.clone(),
+                                    next_pulse,
                                 ));
                             }
                         }
